@@ -26,7 +26,7 @@ This implementation does not use the Pub/Sub functionalities offered by Redis.
 Why not use the Pub/Sub semantics supported out-of-the-box? The reason is two fold:
 
  - What Redis offers with Pub/Sub is a listener model, where each subscriber receives each messages when it is listening, but won't receive them when not connected.
- - In a clustered environment where you have multiple instances of your consumer component running at the same time, each instance would receive each message produced on the channel. We wanted to make sure any given message got consumed once per logical consumer, even when multiple instances of this component are running.
+ - In a clustered environment where you have multiple instances of your consumer component running at the same time, each instance would receive each message produced on the channel. This library makes sure any given message is consumed once per logical consumer, even when multiple instances of this component are running.
  
 Hence the name "Reliable Delivery", because we want to make sure every logical consumer eventually receives all messages produced on a queue once and only once, even when those consumers are not connected - i.e. due to a deployment, a restart or a application failure/crash.
 
