@@ -1,0 +1,22 @@
+# misc
+*~
+.DS_Store
+Thumbs.db
+
+# eclipse conf files
+.classpath
+.pmd*
+.project
+.settings/
+pmd-eclipse.log
+
+# idea conf files
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# building
+build/
+classes/
+target/
