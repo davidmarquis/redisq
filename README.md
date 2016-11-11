@@ -6,19 +6,16 @@ RedisQ - Java library for Reliable Delivery Pub/Sub over Redis
 What is this?
 -------------
 
-RedisQ is a Java implementation of a queue that uses Redis as a backend. It has the following features:
+RedisQ is a Java implementation of a distributed message queue that uses Redis as a backend. It has the following features:
 
- - **Multiple consumers per queue**: Each queue can have multiple consumer clients consuming messages at their own
- rate.
+ - **Multiple consumers per message queue**: Each queue can have multiple consumer clients  messages at their own rate.
  - **Single or multi-threaded consumers**: Each consumer can be either single threaded or multi threaded.
  - **Distributed processing**: Multiple clients/processes/nodes can consume messages from a queue in parallel.
  - **Reliable delivery**: Each consumer on a queue will receive each message.
  - **Pluggable queue/dequeue algorithms**: By default, FIFO is used, but this is pluggable (see below).
- - **Sequential delivery**: Optionally, consumers can be configured to use a locking mechanism on a queue
- to make sure each message is delivered in order.
+ - **Sequential delivery**: Optionally, consumers can be configured to use a locking mechanism on a queue to make sure each message is delivered in order.
  - **Configurable payload serialization**: Out of the box, JAXB XML, JSON and String serializers are available.
- - **Optional pluggable retry strategies**: By default, consumers do not retry consumption. A pluggable mechanism
- exists to enable retry schemes when consuming messages.
+ - **Optional pluggable retry strategies**: By default, consumers do not retry consumption. A pluggable mechanism exists to enable retry schemes when consuming messages.
  - **High performance**: Hey, it's Redis!
 
 High level concepts
@@ -26,59 +23,40 @@ High level concepts
 
 #### Message queue
 
-The core concept of RedisQ is the queue itself. A queue has a name, and that's pretty much it.
-Messages can be published and consumed from a MessageQueue.
-The `MessageQueue` interface provides some monitoring-like operations like getting the list of registered
-consumers on the queue, the number of messages in the queue for each consumer, etc.
+The core concept of RedisQ is the queue itself. A queue has a name, and that's pretty much it. Messages can be published and consumed from a MessageQueue. The `MessageQueue` interface provides some monitoring operations, i.e. getting the list of registered consumers on the queue, the number of messages in the queue for each consumer, etc.
 
 #### Message
 
-A `Message` is the entity that gets published and consumed on the queue. A `Message` instance provides
-some meta information about your actual message, along with its 'payload'. The payload is the actual content
-that you publish and consume. In Redis, each message is stored as a Hash containing all of the message attributes.
-Each attribute in the hash is stored as strings, including the payload. For this reason, a (configurable)
-serialization mechanism exists. More on that later.
+A `Message` is the entity that gets published and consumed on the queue. A `Message` instance provides some meta information about your actual message, along with its 'payload'. The payload is the actual content that you publish and consume. In Redis, each message is stored as a Hash containing all of the message attributes. Each attribute in the hash is stored as strings, including the payload. For this reason, a (configurable) serialization mechanism exists. More on that later.
 
 #### Message producer
 
-The `MessageProducer` is the side of the system that publishes messages on a queue for consumption by
-consumers. Multiple producers can exist for the same queue.
+The `MessageProducer` is the side of the system that publishes messages on a queue for consumption by consumers. Multiple producers can exist for the same logical queue.
 
 #### Message consumer
 
-A message consumer will consume messages from the queue and pass them out to your application using the `MessageListener`
-that you define (more below).
+A message consumer will consume messages from the queue and pass them out to your application using the `MessageListener` that you define (more below).
 
 #### Consumer ID
 
-You can define an ID for each logical application consuming messages on a queue, and messages submitted to a queue
-will be distributed independently to each logical consumer. This allows for per-consumer reliable delivery of messages.
-In practice, a separate Redis List is created and managed for each registered consumer ID.
+You can define an ID for each logical application consuming messages on a queue, and messages submitted to a queue will be distributed independently to each logical consumer. This allows for per-consumer reliable delivery of messages. In practice, a separate Redis List is created and managed for each registered consumer ID.
 
-Multiple application instances (or processes) can be defined using the same consumer ID for distributed processing
-of messages - effectively enabling reliable clustering on your application.
+Multiple application instances (or processes) can be defined using the same consumer ID for distributed processing of messages - effectively enabling reliable clustering on your application.
 
-Using consumer IDs is optional. If not defined, a default consumer ID is used (`default`) on both the producer
-and the consumer side.
+Using consumer IDs is optional. If not defined, a default consumer ID is used (`default`) on both the producer and the consumer side.
 
 The class that is used for defining a message consumer is conveniently called `MessageConsumer`.
 
 #### Message listener
 
-On the consumer side, the `MessageListener` interface represents the link between the queue and your application.
-Your application must implement the `MessageListener` interface in order to actually consume messages. This interface
-defines a single `onMessage(Message<T> message)` method that gets called when there's a message available for consumption.
-This interface is genericly typed and the type you define in your implementation actually gets passed as a hint to your
-configured `PayloadSerializer`.
+On the consumer side, the `MessageListener` interface represents the link between the queue and your application. Your application must implement the `MessageListener` interface in order to actually consume messages. This interface defines a single `onMessage(Message<T> message)` method that gets called when there's a message available for consumption. This interface is genericly typed and the type you define in your implementation actually gets passed as a hint to your configured `PayloadSerializer`.
 
 Configuring payload serialization
 ---------------------------------
 
-By default, JAXB is used to serialize message payloads that you publish through the `MessageProducer` interface
-(producer-side) and that you consume through the `MessageListener` interface (consumer side).
+By default, JAXB is used to serialize message payloads that you publish through the `MessageProducer` interface (producer-side) and that you consume through the `MessageListener` interface (consumer side).
 
-To change this default implementation, you  need to define a bean that implements the `PayloadSerializer` interface
-in your Spring context.
+To change this default implementation, you  need to define a bean that implements the `PayloadSerializer` interface in your Spring context.
 
 A few serializers are available out-of-the-box:
 
@@ -145,14 +123,12 @@ and/or a Consumer:
     </bean>
 ```
 
-Usually, the Producer and Consumer beans will reside in distinct application and processes, but nothing
-prevents you from having both a Producer and a Consumer within the same application.
+Usually, the Producer and Consumer beans will reside in distinct application and processes, but nothing prevents you from having both a Producer and a Consumer within the same application.
 
 Using multi-threading on consumers
 ----------------------------------
 
-By default, consumers are using a threading strategy that uses a single thread. This is easily configurable using
- Spring:
+By default, consumers are using a threading strategy that uses a single thread. Multi-threading is easily configurable using Spring:
 
 ``` xml
     <bean id="messageConsumer" class="ca.radiant3.redisq.consumer.MessageConsumer">
@@ -199,9 +175,7 @@ Consuming messages from a queue
 Manually starting up consumers
 -------------------------------
 
-By default, instances of `MessageConsumer` will automatically start consuming messages from their queue
-when the application starts up. If you want to manually control when the consumers start, set
-`autoStartConsumers` to `false`  on your consumer instances:
+By default, instances of `MessageConsumer` will automatically start consuming messages from their queue when the application starts up. If you want to manually control when the consumers start, set `autoStartConsumers` to `false`  on your consumer instances:
 
 ``` xml
     <bean id="messageConsumer" class="ca.radiant3.redisq.consumer.MessageConsumer">
@@ -215,9 +189,7 @@ when the application starts up. If you want to manually control when the consume
 Enabling retries for failed messages
 -------------------------------------
 
-RedisQ does not retry message consumptions when an exception arises. You must configure a retry strategy
-on your consumers in order to enable retries. Moreover, your code must explictly throw a `RetryableMessageException`
-to tell RedisQ that a consumer error has been identified, and this error is recoverable thus can be retried.
+RedisQ does not retry message consumptions when an exception arises. You must configure a retry strategy on your consumers in order to enable retries. Moreover, your code must explictly throw a `RetryableMessageException` to tell RedisQ that a consumer error has been identified, and this error is recoverable thus can be retried.
 
 ``` xml
     <bean id="messageConsumer" class="ca.radiant3.redisq.consumer.MessageConsumer">
@@ -240,8 +212,7 @@ Two `MessageRetryStrategy` implementation are provided out-of-the-box:
 Changing the queue/dequeue algorithm for a queue
 ------------------------------------------------
 
-By default, each queue is configured to produce and consume messages using FIFO algorithm (First In First Out), but
-this mechanism can be changed using the `queueDequeueStrategy` attribute on class `RedisMessageQueue`.
+By default, each queue is configured to produce and consume messages using FIFO algorithm (First In First Out), but this mechanism can be changed using the `queueDequeueStrategy` attribute on class `RedisMessageQueue`.
 
 ``` xml
     <bean id="myQueue" class="ca.radiant3.redisq.RedisMessageQueue">
@@ -262,9 +233,7 @@ Implementations bundled in the library (in package `ca.radiant3.redisq.queuing`)
 Performance tip: Disabling "multi-consumer" (fan-out) mode
 ---------------------------------------------------------
 
-By default, RedisQ producers will publish messages to all registered consumers (fan-out). If your application's design does
-not require multiple consumers for a given queue, then you should switch to the "single" consumer mode, this will
-improve performances.
+By default, RedisQ producers will publish messages to all registered consumers (fan-out). If your application's design does not require multiple consumers for a given queue, then you should switch to the "single" consumer mode, this will improve performance.
 
 ``` xml
     <bean id="messageProducer" class="ca.radiant3.redisq.producer.MessageProducerImpl">
