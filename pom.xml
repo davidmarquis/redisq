@@ -10,19 +10,14 @@
     <packaging>jar</packaging>
 
     <properties>
-        <spring.version>4.0.2.RELEASE</spring.version>
+        <spring.version>4.3.9.RELEASE</spring.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-redis</artifactId>
-            <version>1.2.1.RELEASE</version>
-        </dependency>
-        <dependency>
-            <groupId>redis.clients</groupId>
-            <artifactId>jedis</artifactId>
-            <version>2.4.1</version>
+            <version>1.8.4.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>commons-lang</groupId>
