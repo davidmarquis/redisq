@@ -82,7 +82,15 @@ Adding a payload serializer is as simple as implementing an interface with a `se
 Maven dependency
 ----------------
 
-Note: This project isn't available on Maven Central (yet).
+This artifact is published on Maven Central since version 2.0.0:
+
+``` xml
+    <dependency>
+        <groupId>com.github.davidmarquis</groupId>
+        <artifactId>redisq</artifactId>
+        <version>2.0.0</version>
+    </dependency>
+```
 
 Usage with Spring
 -----------------
