@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.github.davidmarquis.redisq.utils.KeysFactory.*;
 
+@SuppressWarnings("unchecked")
 public class RedisOps {
 
     @Autowired
@@ -25,19 +26,17 @@ public class RedisOps {
     @Autowired(required = false)
     private MessageConverter messageConverter = new DefaultMessageConverter();
 
-    @SuppressWarnings("unchecked")
     public void ensureConsumerRegistered(String queueName, String consumerId) {
         BoundSetOperations<String, String> ops = redisTemplate.boundSetOps(keyForRegisteredConsumers(queueName));
         ops.add(consumerId);
     }
 
-    @SuppressWarnings("unchecked")
     public Collection<String> getRegisteredConsumers(String queueName) {
         BoundSetOperations<String, String> ops = redisTemplate.boundSetOps(keyForRegisteredConsumers(queueName));
         return ops.members();
     }
 
-    public <T> String addMessage(String queueName, Message<T> message) {
+    public <T> void addMessage(String queueName, Message<T> message) {
         assert message != null;
         assert message.getTimeToLiveSeconds() != null;
 
@@ -48,8 +47,6 @@ public class RedisOps {
         }
 
         saveMessage(queueName, message);
-
-        return msgId;
     }
 
     public <T> void saveMessage(String queueName, Message<T> message) {
@@ -95,7 +92,7 @@ public class RedisOps {
      * @param rangeStart zero-based index of first item to retrieve
      * @param rangeEnd zero-based index of last item to retrieve
      */
-    public <T> List<Message<T>> peekMessagesInQueue(String queueName, String consumerId, long rangeStart, long rangeEnd, Class<T> payloadType) {
+    private <T> List<Message<T>> peekMessagesInQueue(String queueName, String consumerId, long rangeStart, long rangeEnd, Class<T> payloadType) {
 
         String queueKey = keyForConsumerSpecificQueue(queueName, consumerId);
 
@@ -127,7 +124,6 @@ public class RedisOps {
         }
     }
 
-    @SuppressWarnings("unchecked")
     private String generateNextMessageID(String queueName) {
         return Long.toString(
                 redisTemplate.opsForValue().increment(keyForNextID(queueName), 1)

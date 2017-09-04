@@ -17,6 +17,7 @@ import static org.hamcrest.Matchers.*;
 /**
  * Steps related to raw Redis lookups (used for validating Redis data content)
  */
+@SuppressWarnings("unchecked")
 public class RedisSteps extends Steps {
     @Autowired
     private RedisTemplate<String, ?> redisTemplate;

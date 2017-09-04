@@ -41,17 +41,17 @@ public class QueueSteps extends Steps {
         lastQueueCreated = queueName;
     }
 
-    public MessageQueue queueWithName(String name) {
-        MessageQueue queue = queues.get(name);
-        assertThat(queue, is(notNullValue()));
-
-        return queue;
-    }
-
     @And("^this queue has a Random queue/dequeue strategy configured$")
     public void this_queue_has_a_Random_queue_dequeue_strategy_configured() throws Throwable {
         RedisMessageQueue queue = (RedisMessageQueue) queueWithName(lastQueueCreated);
 
         queue.setQueueDequeueStrategy(new RandomQueueDequeueStrategy(redisOps));
+    }
+
+    public MessageQueue queueWithName(String name) {
+        MessageQueue queue = queues.get(name);
+        assertThat(queue, is(notNullValue()));
+
+        return queue;
     }
 }

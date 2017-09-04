@@ -163,7 +163,7 @@ public class MessageConsumer<T> {
         this.autoStartConsumers = autoStartConsumers;
     }
 
-    public void setRetryStrategy(MessageRetryStrategy retryStrategy) {
+    public void setRetryStrategy(MessageRetryStrategy<T> retryStrategy) {
         this.retryStrategy = retryStrategy;
     }
 }

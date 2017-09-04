@@ -9,6 +9,7 @@ public class StringPayloadSerializer implements PayloadSerializer {
         return ObjectUtils.toString(payload);
     }
 
+    @SuppressWarnings("unchecked")
     public <T> T deserialize(String payload, Class<T> type) throws SerializationException {
         return (T) payload;
     }

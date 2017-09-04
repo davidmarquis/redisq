@@ -29,7 +29,7 @@ public class ConsumerSteps extends Steps {
     private QueueSteps queueSteps;
 
     private Map<String, List<MessageConsumer>> consumersById = new HashMap<String, List<MessageConsumer>>();
-    private MessageConsumer lastCreatedConsumer = null;
+    private MessageConsumer<String> lastCreatedConsumer = null;
 
     @After
     public void afterScenario() throws Throwable {
@@ -56,11 +56,7 @@ public class ConsumerSteps extends Steps {
         consumer.setMessageListener(new RecordingMessageListener());
         consumer.setConsumerId(consumerId);
 
-        List<MessageConsumer> consumers = consumersById.get(consumerId);
-        if (consumers == null) {
-            consumers = new ArrayList<MessageConsumer>();
-            consumersById.put(consumerId, consumers);
-        }
+        List<MessageConsumer> consumers = consumersById.computeIfAbsent(consumerId, k -> new ArrayList<>());
         consumers.add(consumer);
         lastCreatedConsumer = consumer;
 
@@ -104,7 +100,7 @@ public class ConsumerSteps extends Steps {
             throw new IllegalStateException("No consumer was created by tests.");
         }
 
-        MaxRetriesStrategy retryStrategy = new MaxRetriesStrategy(maxRetries);
+        MaxRetriesStrategy<String> retryStrategy = new MaxRetriesStrategy<>(maxRetries);
         retryStrategy.setRedisOps(redisOps);
         lastCreatedConsumer.setRetryStrategy(retryStrategy);
     }

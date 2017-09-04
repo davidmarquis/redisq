@@ -52,6 +52,7 @@ public class ProducerSteps extends Steps {
         messageSender.withTimeToLive(time, timeUnit);
     }
 
+    @SuppressWarnings("unchecked")
     private MessageProducer<String> aMessageProducer(String queue) {
         DefaultMessageProducer<String> producer = ctx.getAutowireCapableBeanFactory().createBean(DefaultMessageProducer.class);
         producer.setQueue(queueSteps.queueWithName(queue));
