@@ -118,7 +118,7 @@ Then declare each queue as a bean of type RedisMessageQueue:
 Once your queue bean is created, you need to attach a Producer:
 
 ``` xml
-    <bean id="messageProducer" class="com.github.davidmarquis.redisq.producer.MessageProducerImpl">
+    <bean id="messageProducer" class="com.github.davidmarquis.redisq.producer.DefaultMessageProducer">
         <property name="queue" ref="myQueue"/>
     </bean>
 ```
@@ -249,7 +249,7 @@ Performance tip: Disabling "multi-consumer" (fan-out) mode
 By default, RedisQ producers will publish messages to all registered consumers (fan-out). If your application's design does not require multiple consumers for a given queue, then you should switch to the "single" consumer mode, this will slightly improve performance for producing each message as it removes the need for a lookup that is otherwise required when multiple consumers are used.
 
 ``` xml
-    <bean id="messageProducer" class="com.github.davidmarquis.redisq.producer.MessageProducerImpl">
+    <bean id="messageProducer" class="com.github.davidmarquis.redisq.producer.DefaultMessageProducer">
         <property name="queue" ref="myQueue"/>
         <property name="submissionStrategy">
             <bean class="com.github.davidmarquis.redisq.producer.SingleConsumerSubmissionStrategy"/>

@@ -1,7 +1,7 @@
 package com.github.davidmarquis.redisq.cucumber.steps;
 
+import com.github.davidmarquis.redisq.producer.DefaultMessageProducer;
 import com.github.davidmarquis.redisq.producer.MessageProducer;
-import com.github.davidmarquis.redisq.producer.MessageProducerImpl;
 import com.github.davidmarquis.redisq.producer.MessageSender;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.And;
@@ -53,7 +53,7 @@ public class ProducerSteps extends Steps {
     }
 
     private MessageProducer<String> aMessageProducer(String queue) {
-        MessageProducerImpl<String> producer = ctx.getAutowireCapableBeanFactory().createBean(MessageProducerImpl.class);
+        DefaultMessageProducer<String> producer = ctx.getAutowireCapableBeanFactory().createBean(DefaultMessageProducer.class);
         producer.setQueue(queueSteps.queueWithName(queue));
 
         return producer;

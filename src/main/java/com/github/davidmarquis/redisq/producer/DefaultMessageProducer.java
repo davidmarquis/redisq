@@ -10,7 +10,7 @@ import javax.annotation.PostConstruct;
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
-public class MessageProducerImpl<T> implements MessageProducer<T> {
+public class DefaultMessageProducer<T> implements MessageProducer<T> {
 
     @Autowired
     private RedisOps redisOps;
@@ -98,9 +98,9 @@ public class MessageProducerImpl<T> implements MessageProducer<T> {
             redisOps.addMessage(queue.getQueueName(), message);
 
             if (StringUtils.isNotEmpty(targetConsumer)) {
-                MessageProducerImpl.this.submit(message, targetConsumer);
+                DefaultMessageProducer.this.submit(message, targetConsumer);
             } else {
-                MessageProducerImpl.this.submit(message);
+                DefaultMessageProducer.this.submit(message);
             }
         }
     }
