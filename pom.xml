@@ -4,7 +4,7 @@
 
     <groupId>com.github.davidmarquis</groupId>
     <artifactId>redisq</artifactId>
-    <version>2.0.0</version>
+    <version>2.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>redisq</name>
@@ -23,7 +23,7 @@
         <connection>scm:git:git@github.com:davidmarquis/redisq.git</connection>
         <developerConnection>scm:git:git@github.com:davidmarquis/redisq.git</developerConnection>
         <url>git@github.com:davidmarquis/redisq.git</url>
-        <tag>redisq-2.0.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <developers>
