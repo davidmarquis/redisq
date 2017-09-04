@@ -104,13 +104,13 @@ First declare the base beans for Redis connectivity:
         </property>
     </bean>
 
-    <bean id="redisOps" class="ca.radiant3.redisq.persistence.RedisOps" />
+    <bean id="redisOps" class="com.github.davidmarquis.redisq.persistence.RedisOps" />
 ```
 
 Then declare each queue as a bean of type RedisMessageQueue:
 
 ``` xml
-    <bean id="myQueue" class="ca.radiant3.redisq.RedisMessageQueue">
+    <bean id="myQueue" class="com.github.davidmarquis.redisq.RedisMessageQueue">
         <property name="queueName" value="my.queue"/>
     </bean>
 ```
@@ -118,7 +118,7 @@ Then declare each queue as a bean of type RedisMessageQueue:
 Once your queue bean is created, you need to attach a Producer:
 
 ``` xml
-    <bean id="messageProducer" class="ca.radiant3.redisq.producer.MessageProducerImpl">
+    <bean id="messageProducer" class="com.github.davidmarquis.redisq.producer.MessageProducerImpl">
         <property name="queue" ref="myQueue"/>
     </bean>
 ```
@@ -128,7 +128,7 @@ and/or a Consumer:
 ``` xml
     <bean id="messageListener" class="..."/>
 
-    <bean id="messageConsumer" class="ca.radiant3.redisq.consumer.MessageConsumer">
+    <bean id="messageConsumer" class="com.github.davidmarquis.redisq.consumer.MessageConsumer">
         <property name="queue" ref="myQueue" />
         <property name="consumerId" value="someConsumerId" />
         <property name="messageListener" ref="messageListener"/>
@@ -143,12 +143,12 @@ Using multi-threading on consumers
 By default, consumers are using a threading strategy that uses a single thread. Multi-threading is easily configurable using Spring:
 
 ``` xml
-    <bean id="messageConsumer" class="ca.radiant3.redisq.consumer.MessageConsumer">
+    <bean id="messageConsumer" class="com.github.davidmarquis.redisq.consumer.MessageConsumer">
         <property name="queue" ref="myQueue" />
         <property name="consumerId" value="someConsumerId" />
         <property name="messageListener" ref="messageListener"/>
         <property name="threadingStrategy">
-            <bean class="ca.radiant3.redisq.consumer.MultiThreadingStrategy">
+            <bean class="com.github.davidmarquis.redisq.consumer.MultiThreadingStrategy">
                 <constructor-arg name="numThreads" value="4"/>
             </bean>
         </property>
@@ -191,7 +191,7 @@ Manually starting up consumers
 By default, instances of `MessageConsumer` will automatically start consuming messages from their queue when the application starts up. If you want to manually control when the consumers start, set `autoStartConsumers` to `false`  on your consumer instances:
 
 ``` xml
-    <bean id="messageConsumer" class="ca.radiant3.redisq.consumer.MessageConsumer">
+    <bean id="messageConsumer" class="com.github.davidmarquis.redisq.consumer.MessageConsumer">
         <property name="queue" ref="myQueue" />
         <property name="consumerId" value="someConsumerId" />
         <property name="messageListener" ref="messageListener"/>
@@ -207,12 +207,12 @@ RedisQ does not retry message consumptions when an exception arises during messa
 Moreover, __your code must explicitly throw a `RetryableMessageException`__ to inform RedisQ that a known consumer error has been identified, that this error is recoverable and thus can be retried.
 
 ``` xml
-    <bean id="messageConsumer" class="ca.radiant3.redisq.consumer.MessageConsumer">
+    <bean id="messageConsumer" class="com.github.davidmarquis.redisq.consumer.MessageConsumer">
         <property name="queue" ref="myQueue" />
         <property name="consumerId" value="someConsumerId" />
         <property name="messageListener" ref="messageListener"/>
         <property name="retryStrategy">
-            <bean class="ca.radiant3.redisq.consumer.retry.MaxRetriesStrategy">
+            <bean class="com.github.davidmarquis.redisq.consumer.retry.MaxRetriesStrategy">
                 <constructor-arg name="maxRetries" value="2"/>
             </bean>
         </property>
@@ -230,15 +230,15 @@ Changing the queue/dequeue algorithm for a queue
 By default, each queue is configured to produce and consume messages as FIFO (First In First Out), but this mechanism can be changed using the `queueDequeueStrategy` attribute on class `RedisMessageQueue`.
 
 ``` xml
-    <bean id="myQueue" class="ca.radiant3.redisq.RedisMessageQueue">
+    <bean id="myQueue" class="com.github.davidmarquis.redisq.RedisMessageQueue">
         <property name="queueName" value="my.queue"/>
         <property name="queueDequeueStrategy">
-            <bean class="ca.radiant3.redisq.queuing.FIFOQueueDequeueStrategy"/>
+            <bean class="com.github.davidmarquis.redisq.queuing.FIFOQueueDequeueStrategy"/>
         </property>
     </bean>
 ```
 
-Implementations bundled in the library (in package `ca.radiant3.redisq.queuing`):
+Implementations bundled in the library (in package `com.github.davidmarquis.redisq.queuing`):
 
 - **FIFOQueueDequeueStrategy**: (default) Messages are submitted to the tail of a Redis List, and are consumed from the head.
 - **RandomQueueDequeueStrategy**: Messages are submitted in a Redis Set, then consumed in random order from that set. To prevent the need for polling, a separate supporting Redis List is used to notify consumers of new items in the Set.
@@ -249,10 +249,10 @@ Performance tip: Disabling "multi-consumer" (fan-out) mode
 By default, RedisQ producers will publish messages to all registered consumers (fan-out). If your application's design does not require multiple consumers for a given queue, then you should switch to the "single" consumer mode, this will slightly improve performance for producing each message as it removes the need for a lookup that is otherwise required when multiple consumers are used.
 
 ``` xml
-    <bean id="messageProducer" class="ca.radiant3.redisq.producer.MessageProducerImpl">
+    <bean id="messageProducer" class="com.github.davidmarquis.redisq.producer.MessageProducerImpl">
         <property name="queue" ref="myQueue"/>
         <property name="submissionStrategy">
-            <bean class="ca.radiant3.redisq.producer.SingleConsumerSubmissionStrategy"/>
+            <bean class="com.github.davidmarquis.redisq.producer.SingleConsumerSubmissionStrategy"/>
         </property>
     </bean>
 ```

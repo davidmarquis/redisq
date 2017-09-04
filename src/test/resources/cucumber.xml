@@ -7,8 +7,8 @@
 
     <import resource="application-context-test.xml" />
 
-    <bean id="nonLockingDequeueStrategy" class="ca.radiant3.redisq.queuing.FIFOQueueDequeueStrategy">
+    <bean id="nonLockingDequeueStrategy" class="com.github.davidmarquis.redisq.queuing.FIFOQueueDequeueStrategy">
         <property name="dequeueTimeoutSeconds" value="1"/>
     </bean>
-    <bean id="stringSerializer" class="ca.radiant3.redisq.serialization.StringPayloadSerializer"/>
+    <bean id="stringSerializer" class="com.github.davidmarquis.redisq.serialization.StringPayloadSerializer"/>
 </beans>

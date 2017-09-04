@@ -19,7 +19,7 @@
         </property>
     </bean>
 
-    <bean id="redisOps" class="ca.radiant3.redisq.persistence.RedisOps">
+    <bean id="redisOps" class="com.github.davidmarquis.redisq.persistence.RedisOps">
         <property name="redisTemplate" ref="redisTemplate"/>
     </bean>
 
